@@ -7,6 +7,7 @@
 #define SERVER_ADDR "140.159.153.159"
 #define SERVER_PORT 502
 
+/*Variables for Read Register*/
 uint16_t tab_reg[64];
 int rc;
 int i;
@@ -37,7 +38,7 @@ modbus_t *ctx;
 	}
 
 	else{
-		fprintf(stderr, "Connection Succesful\n");
+		fprintf(stderr, "Connection Successful\n");
 	}
 
 /*Read Registers*/
@@ -50,7 +51,7 @@ modbus_t *ctx;
 		for (i=0; i < rc; i++) {
 			printf("reg[%d]=%d (0x%X)\n", i, tab_reg[i], tab_reg[i]);
 		}
-
+/*Close and Free Connection*/
 	modbus_close(ctx);
 	modbus_free(ctx);
 return 0;

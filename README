@@ -1,0 +1,10 @@
+README Document for the First Part of ESS4100 Project
+
+By Edward Whittle - 4059767
+__________________________________________________________________
+
+This application uses libmodbus libraries to connect to a server on the Victoria University intranet. The server address is 140.159.153.159 with port number 502. 
+The application reads in the three random 32-bit numbers broadcasted by the server and prints them on the stdout. It will also print messages if the libmodbus context is succesfully created and if the connection is successful.
+
+If there are any problems with the creation of the libmodbus context, connection or reading of the registers the program will print out the error message on stderr output with the error message type attached. 
+
