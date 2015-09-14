@@ -632,6 +632,8 @@ ac_subst_vars='am__EXEEXT_FALSE
 am__EXEEXT_TRUE
 LTLIBOBJS
 LIB@&t@OBJS
+BACNET_LIBS
+BACNET_CFLAGS
 MODBUS_LIBS
 MODBUS_CFLAGS
 PKG_CONFIG_LIBDIR
@@ -778,7 +780,9 @@ PKG_CONFIG
 PKG_CONFIG_PATH
 PKG_CONFIG_LIBDIR
 MODBUS_CFLAGS
-MODBUS_LIBS'
+MODBUS_LIBS
+BACNET_CFLAGS
+BACNET_LIBS'
 
 
 # Initialize some variables set by options.
@@ -1440,6 +1444,9 @@ Some influential environment variables:
   MODBUS_CFLAGS 
               C compiler flags for MODBUS, overriding pkg-config
   MODBUS_LIBS linker flags for MODBUS, overriding pkg-config
+  BACNET_CFLAGS 
+              C compiler flags for BACNET, overriding pkg-config
+  BACNET_LIBS linker flags for BACNET, overriding pkg-config
 
 Use these variables to override the choices made by `configure' or to help
 it to find libraries and programs with nonstandard names/locations.
@@ -12640,6 +12647,7 @@ fi
 
 
 
+
 if test "x$ac_cv_env_PKG_CONFIG_set" != "xset"; then
 	if test -n "$ac_tool_prefix"; then
   # Extract the first word of "${ac_tool_prefix}pkg-config", so it can be a program name with args.
@@ -12845,7 +12853,157 @@ $as_echo "yes" >&6; }
 	
 fi
 
-ac_config_files="$ac_config_files Makefile src/Makefile"
+pkg_failed=no
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for BACNET" >&5
+$as_echo_n "checking for BACNET... " >&6; }
+
+if test -n "$BACNET_CFLAGS"; then
+    pkg_cv_BACNET_CFLAGS="$BACNET_CFLAGS"
+ elif test -n "$PKG_CONFIG"; then
+    if test -n "$PKG_CONFIG" && \
+    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"libbacnet\""; } >&5
+  ($PKG_CONFIG --exists --print-errors "libbacnet") 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; then
+  pkg_cv_BACNET_CFLAGS=`$PKG_CONFIG --cflags "libbacnet" 2>/dev/null`
+		      test "x$?" != "x0" && pkg_failed=yes 
+else
+  pkg_failed=yes
+fi
+ else
+    pkg_failed=untried
+fi
+if test -n "$BACNET_LIBS"; then
+    pkg_cv_BACNET_LIBS="$BACNET_LIBS"
+ elif test -n "$PKG_CONFIG"; then
+    if test -n "$PKG_CONFIG" && \
+    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"libbacnet\""; } >&5
+  ($PKG_CONFIG --exists --print-errors "libbacnet") 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; then
+  pkg_cv_BACNET_LIBS=`$PKG_CONFIG --libs "libbacnet" 2>/dev/null`
+		      test "x$?" != "x0" && pkg_failed=yes 
+else
+  pkg_failed=yes
+fi
+ else
+    pkg_failed=untried
+fi
+
+
+
+if test $pkg_failed = yes; then
+   	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+        
+if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
+        _pkg_short_errors_supported=yes
+else
+        _pkg_short_errors_supported=no
+fi
+        if test $_pkg_short_errors_supported = yes; then
+	        BACNET_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors --cflags --libs "libbacnet" 2>&1`
+        else 
+	        BACNET_PKG_ERRORS=`$PKG_CONFIG --print-errors --cflags --libs "libbacnet" 2>&1`
+        fi
+	# Put the nasty error message in config.log where it belongs
+	echo "$BACNET_PKG_ERRORS" >&5
+
+	as_fn_error $? "Package requirements (libbacnet) were not met:
+
+$BACNET_PKG_ERRORS
+
+Consider adjusting the PKG_CONFIG_PATH environment variable if you
+installed software in a non-standard prefix.
+
+Alternatively, you may set the environment variables BACNET_CFLAGS
+and BACNET_LIBS to avoid the need to call pkg-config.
+See the pkg-config man page for more details." "$LINENO" 5        
+elif test $pkg_failed = untried; then
+     	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+	{ { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
+as_fn_error $? "The pkg-config script could not be found or is too old.  Make sure it
+is in your PATH or set the PKG_CONFIG environment variable to the full
+path to pkg-config.
+
+Alternatively, you may set the environment variables BACNET_CFLAGS
+and BACNET_LIBS to avoid the need to call pkg-config.
+See the pkg-config man page for more details.
+
+To get pkg-config, see <http://pkg-config.freedesktop.org/>.
+See \`config.log' for more details" "$LINENO" 5; }        
+else
+	BACNET_CFLAGS=$pkg_cv_BACNET_CFLAGS
+	BACNET_LIBS=$pkg_cv_BACNET_LIBS
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+	
+fi
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for library containing pthread_create" >&5
+$as_echo_n "checking for library containing pthread_create... " >&6; }
+if ${ac_cv_search_pthread_create+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_func_search_save_LIBS=$LIBS
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char pthread_create ();
+int
+main ()
+{
+return pthread_create ();
+  ;
+  return 0;
+}
+_ACEOF
+for ac_lib in '' pthread; do
+  if test -z "$ac_lib"; then
+    ac_res="none required"
+  else
+    ac_res=-l$ac_lib
+    LIBS="-l$ac_lib  $ac_func_search_save_LIBS"
+  fi
+  if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_search_pthread_create=$ac_res
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext
+  if ${ac_cv_search_pthread_create+:} false; then :
+  break
+fi
+done
+if ${ac_cv_search_pthread_create+:} false; then :
+  
+else
+  ac_cv_search_pthread_create=no
+fi
+rm conftest.$ac_ext
+LIBS=$ac_func_search_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_search_pthread_create" >&5
+$as_echo "$ac_cv_search_pthread_create" >&6; }
+ac_res=$ac_cv_search_pthread_create
+if test "$ac_res" != no; then :
+  test "$ac_res" = "none required" || LIBS="$ac_res $LIBS"
+  
+else
+  as_fn_error $? "*** POSIX threads support required" "$LINENO" 5
+fi
+
+
+ac_config_files="$ac_config_files Makefile src/Makefile scripts/Makefile"
 
 
 cat >confcache <<\_ACEOF
@@ -13865,6 +14023,7 @@ do
     "libtool") CONFIG_COMMANDS="$CONFIG_COMMANDS libtool" ;;
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
     "src/Makefile") CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
+    "scripts/Makefile") CONFIG_FILES="$CONFIG_FILES scripts/Makefile" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;
   esac

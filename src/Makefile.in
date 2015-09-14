@@ -14,6 +14,8 @@
 
 @SET_MAKE@
 
+#include $(top_srcdir)/common.am
+
 VPATH = @srcdir@
 am__is_gnu_make = test -n '$(MAKEFILE_LIST)' && test -n '$(MAKELEVEL)'
 am__make_running_with_option = \
@@ -95,13 +97,17 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
-am_hello_world_OBJECTS = hello_world.$(OBJEXT)
+am_hello_world_OBJECTS = hello_world-hello_world.$(OBJEXT)
 hello_world_OBJECTS = $(am_hello_world_OBJECTS)
-hello_world_LDADD = $(LDADD)
+am__DEPENDENCIES_1 =
+hello_world_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
 am__v_lt_1 = 
+hello_world_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(hello_world_CFLAGS) \
+	$(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -171,6 +177,8 @@ AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
+BACNET_CFLAGS = @BACNET_CFLAGS@
+BACNET_LIBS = @BACNET_LIBS@
 CC = @CC@
 CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
@@ -284,7 +292,12 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 hello_world_SOURCES = hello_world.c
-all: all-am
+hello_world_CFLAGS = $(AM_CFLAGS) $(BACNET_CFLAGS) $(MODBUS_CFLAGS)
+hello_world_LDADD = $(AM_LIBS) $(BACNET_LIBS) $(MODBUS_LIBS)
+BUILT_SOURCES = bacnet_namespace.h .bacnet_dependent_src_stamp
+EXTRA_DIST = bacnet_api_names
+all: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) all-am
 
 .SUFFIXES:
 .SUFFIXES: .c .lo .o .obj
@@ -370,7 +383,7 @@ clean-binPROGRAMS:
 
 hello_world$(EXEEXT): $(hello_world_OBJECTS) $(hello_world_DEPENDENCIES) $(EXTRA_hello_world_DEPENDENCIES) 
 	@rm -f hello_world$(EXEEXT)
-	$(AM_V_CCLD)$(LINK) $(hello_world_OBJECTS) $(hello_world_LDADD) $(LIBS)
+	$(AM_V_CCLD)$(hello_world_LINK) $(hello_world_OBJECTS) $(hello_world_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -378,7 +391,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hello_world.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hello_world-hello_world.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -400,6 +413,20 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LTCOMPILE) -c -o $@ $<
+
+hello_world-hello_world.o: hello_world.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(hello_world_CFLAGS) $(CFLAGS) -MT hello_world-hello_world.o -MD -MP -MF $(DEPDIR)/hello_world-hello_world.Tpo -c -o hello_world-hello_world.o `test -f 'hello_world.c' || echo '$(srcdir)/'`hello_world.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/hello_world-hello_world.Tpo $(DEPDIR)/hello_world-hello_world.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='hello_world.c' object='hello_world-hello_world.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(hello_world_CFLAGS) $(CFLAGS) -c -o hello_world-hello_world.o `test -f 'hello_world.c' || echo '$(srcdir)/'`hello_world.c
+
+hello_world-hello_world.obj: hello_world.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(hello_world_CFLAGS) $(CFLAGS) -MT hello_world-hello_world.obj -MD -MP -MF $(DEPDIR)/hello_world-hello_world.Tpo -c -o hello_world-hello_world.obj `if test -f 'hello_world.c'; then $(CYGPATH_W) 'hello_world.c'; else $(CYGPATH_W) '$(srcdir)/hello_world.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/hello_world-hello_world.Tpo $(DEPDIR)/hello_world-hello_world.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='hello_world.c' object='hello_world-hello_world.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(hello_world_CFLAGS) $(CFLAGS) -c -o hello_world-hello_world.obj `if test -f 'hello_world.c'; then $(CYGPATH_W) 'hello_world.c'; else $(CYGPATH_W) '$(srcdir)/hello_world.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -490,13 +517,15 @@ distdir: $(DISTFILES)
 	  fi; \
 	done
 check-am: all-am
-check: check-am
+check: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) check-am
 all-am: Makefile $(PROGRAMS)
 installdirs:
 	for dir in "$(DESTDIR)$(bindir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
 	done
-install: install-am
+install: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) install-am
 install-exec: install-exec-am
 install-data: install-data-am
 uninstall: uninstall-am
@@ -526,6 +555,7 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
+	-test -z "$(BUILT_SOURCES)" || rm -f $(BUILT_SOURCES)
 clean: clean-am
 
 clean-am: clean-binPROGRAMS clean-generic clean-libtool mostlyclean-am
@@ -596,7 +626,7 @@ ps-am:
 
 uninstall-am: uninstall-binPROGRAMS
 
-.MAKE: install-am install-strip
+.MAKE: all check install install-am install-strip
 
 .PHONY: CTAGS GTAGS TAGS all all-am check check-am clean \
 	clean-binPROGRAMS clean-generic clean-libtool cscopelist-am \
@@ -612,6 +642,13 @@ uninstall-am: uninstall-binPROGRAMS
 	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
 	tags tags-am uninstall uninstall-am uninstall-binPROGRAMS
 
+
+.bacnet_dependent_src_stamp: bacnet_api_names $(BACNET_DEPENDENT_SRC)
+	cat $< | $(top_srcdir)/scripts/check_namespace.sh $< $?
+	touch $@
+
+bacnet_namespace.h: bacnet_api_names
+	cat $< | $(top_srcdir)/scripts/build_namespace.sh > $@
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

@@ -393,7 +393,7 @@ on `(hostname || uname -n) 2>/dev/null | sed 1q`
 "
 
 # Files that config.status was made for.
-config_files=" Makefile src/Makefile"
+config_files=" Makefile src/Makefile scripts/Makefile"
 config_headers=" config.h"
 config_commands=" depfiles libtool"
 
@@ -751,6 +751,7 @@ do
     "libtool") CONFIG_COMMANDS="$CONFIG_COMMANDS libtool" ;;
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
     "src/Makefile") CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
+    "scripts/Makefile") CONFIG_FILES="$CONFIG_FILES scripts/Makefile" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;
   esac
@@ -820,6 +821,8 @@ S["am__EXEEXT_FALSE"]=""
 S["am__EXEEXT_TRUE"]="#"
 S["LTLIBOBJS"]=""
 S["LIBOBJS"]=""
+S["BACNET_LIBS"]="-L/usr/lib -lbacnet -lm "
+S["BACNET_CFLAGS"]="-DBACDL_ALL "
 S["MODBUS_LIBS"]="-lmodbus "
 S["MODBUS_CFLAGS"]="-I/usr/include/modbus "
 S["PKG_CONFIG_LIBDIR"]=""
@@ -903,7 +906,7 @@ S["INSTALL_PROGRAM"]="${INSTALL}"
 S["target_alias"]=""
 S["host_alias"]=""
 S["build_alias"]=""
-S["LIBS"]=""
+S["LIBS"]="-lpthread "
 S["ECHO_T"]=""
 S["ECHO_N"]="-n"
 S["ECHO_C"]=""

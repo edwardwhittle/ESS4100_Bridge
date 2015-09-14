@@ -2826,29 +2826,38 @@ m4trace:configure.ac:11: -1- m4_pattern_allow([^am__fastdepCC_TRUE$])
 m4trace:configure.ac:11: -1- m4_pattern_allow([^am__fastdepCC_FALSE$])
 m4trace:configure.ac:11: -1- _AM_SUBST_NOTMAKE([am__fastdepCC_TRUE])
 m4trace:configure.ac:11: -1- _AM_SUBST_NOTMAKE([am__fastdepCC_FALSE])
-m4trace:configure.ac:13: -1- PKG_CHECK_MODULES([MODBUS], [libmodbus])
-m4trace:configure.ac:13: -1- PKG_PROG_PKG_CONFIG
-m4trace:configure.ac:13: -1- m4_pattern_forbid([^_?PKG_[A-Z_]+$])
-m4trace:configure.ac:13: -1- m4_pattern_allow([^PKG_CONFIG(_(PATH|LIBDIR|SYSROOT_DIR|ALLOW_SYSTEM_(CFLAGS|LIBS)))?$])
-m4trace:configure.ac:13: -1- m4_pattern_allow([^PKG_CONFIG_(DISABLE_UNINSTALLED|TOP_BUILD_DIR|DEBUG_SPEW)$])
-m4trace:configure.ac:13: -1- m4_pattern_allow([^PKG_CONFIG$])
-m4trace:configure.ac:13: -1- m4_pattern_allow([^PKG_CONFIG_PATH$])
-m4trace:configure.ac:13: -1- m4_pattern_allow([^PKG_CONFIG_LIBDIR$])
-m4trace:configure.ac:13: -1- m4_pattern_allow([^PKG_CONFIG$])
-m4trace:configure.ac:13: -1- m4_pattern_allow([^MODBUS_CFLAGS$])
-m4trace:configure.ac:13: -1- m4_pattern_allow([^MODBUS_LIBS$])
-m4trace:configure.ac:13: -1- PKG_CHECK_EXISTS([libmodbus], [pkg_cv_[]MODBUS_CFLAGS=`$PKG_CONFIG --[]cflags "libmodbus" 2>/dev/null`
+m4trace:configure.ac:12: -1- AM_PROG_CC_C_O
+m4trace:configure.ac:14: -1- PKG_CHECK_MODULES([MODBUS], [libmodbus])
+m4trace:configure.ac:14: -1- PKG_PROG_PKG_CONFIG
+m4trace:configure.ac:14: -1- m4_pattern_forbid([^_?PKG_[A-Z_]+$])
+m4trace:configure.ac:14: -1- m4_pattern_allow([^PKG_CONFIG(_(PATH|LIBDIR|SYSROOT_DIR|ALLOW_SYSTEM_(CFLAGS|LIBS)))?$])
+m4trace:configure.ac:14: -1- m4_pattern_allow([^PKG_CONFIG_(DISABLE_UNINSTALLED|TOP_BUILD_DIR|DEBUG_SPEW)$])
+m4trace:configure.ac:14: -1- m4_pattern_allow([^PKG_CONFIG$])
+m4trace:configure.ac:14: -1- m4_pattern_allow([^PKG_CONFIG_PATH$])
+m4trace:configure.ac:14: -1- m4_pattern_allow([^PKG_CONFIG_LIBDIR$])
+m4trace:configure.ac:14: -1- m4_pattern_allow([^PKG_CONFIG$])
+m4trace:configure.ac:14: -1- m4_pattern_allow([^MODBUS_CFLAGS$])
+m4trace:configure.ac:14: -1- m4_pattern_allow([^MODBUS_LIBS$])
+m4trace:configure.ac:14: -1- PKG_CHECK_EXISTS([libmodbus], [pkg_cv_[]MODBUS_CFLAGS=`$PKG_CONFIG --[]cflags "libmodbus" 2>/dev/null`
 		      test "x$?" != "x0" && pkg_failed=yes ], [pkg_failed=yes])
-m4trace:configure.ac:13: -1- PKG_CHECK_EXISTS([libmodbus], [pkg_cv_[]MODBUS_LIBS=`$PKG_CONFIG --[]libs "libmodbus" 2>/dev/null`
+m4trace:configure.ac:14: -1- PKG_CHECK_EXISTS([libmodbus], [pkg_cv_[]MODBUS_LIBS=`$PKG_CONFIG --[]libs "libmodbus" 2>/dev/null`
 		      test "x$?" != "x0" && pkg_failed=yes ], [pkg_failed=yes])
-m4trace:configure.ac:13: -1- _PKG_SHORT_ERRORS_SUPPORTED
-m4trace:configure.ac:20: -1- m4_pattern_allow([^LIB@&t@OBJS$])
-m4trace:configure.ac:20: -1- m4_pattern_allow([^LTLIBOBJS$])
-m4trace:configure.ac:20: -1- AM_CONDITIONAL([am__EXEEXT], [test -n "$EXEEXT"])
-m4trace:configure.ac:20: -1- m4_pattern_allow([^am__EXEEXT_TRUE$])
-m4trace:configure.ac:20: -1- m4_pattern_allow([^am__EXEEXT_FALSE$])
-m4trace:configure.ac:20: -1- _AM_SUBST_NOTMAKE([am__EXEEXT_TRUE])
-m4trace:configure.ac:20: -1- _AM_SUBST_NOTMAKE([am__EXEEXT_FALSE])
-m4trace:configure.ac:20: -1- _AC_AM_CONFIG_HEADER_HOOK(["$ac_file"])
-m4trace:configure.ac:20: -1- _AM_OUTPUT_DEPENDENCY_COMMANDS
-m4trace:configure.ac:20: -1- _LT_PROG_LTMAIN
+m4trace:configure.ac:14: -1- _PKG_SHORT_ERRORS_SUPPORTED
+m4trace:configure.ac:15: -1- PKG_CHECK_MODULES([BACNET], [libbacnet])
+m4trace:configure.ac:15: -1- m4_pattern_allow([^BACNET_CFLAGS$])
+m4trace:configure.ac:15: -1- m4_pattern_allow([^BACNET_LIBS$])
+m4trace:configure.ac:15: -1- PKG_CHECK_EXISTS([libbacnet], [pkg_cv_[]BACNET_CFLAGS=`$PKG_CONFIG --[]cflags "libbacnet" 2>/dev/null`
+		      test "x$?" != "x0" && pkg_failed=yes ], [pkg_failed=yes])
+m4trace:configure.ac:15: -1- PKG_CHECK_EXISTS([libbacnet], [pkg_cv_[]BACNET_LIBS=`$PKG_CONFIG --[]libs "libbacnet" 2>/dev/null`
+		      test "x$?" != "x0" && pkg_failed=yes ], [pkg_failed=yes])
+m4trace:configure.ac:15: -1- _PKG_SHORT_ERRORS_SUPPORTED
+m4trace:configure.ac:26: -1- m4_pattern_allow([^LIB@&t@OBJS$])
+m4trace:configure.ac:26: -1- m4_pattern_allow([^LTLIBOBJS$])
+m4trace:configure.ac:26: -1- AM_CONDITIONAL([am__EXEEXT], [test -n "$EXEEXT"])
+m4trace:configure.ac:26: -1- m4_pattern_allow([^am__EXEEXT_TRUE$])
+m4trace:configure.ac:26: -1- m4_pattern_allow([^am__EXEEXT_FALSE$])
+m4trace:configure.ac:26: -1- _AM_SUBST_NOTMAKE([am__EXEEXT_TRUE])
+m4trace:configure.ac:26: -1- _AM_SUBST_NOTMAKE([am__EXEEXT_FALSE])
+m4trace:configure.ac:26: -1- _AC_AM_CONFIG_HEADER_HOOK(["$ac_file"])
+m4trace:configure.ac:26: -1- _AM_OUTPUT_DEPENDENCY_COMMANDS
+m4trace:configure.ac:26: -1- _LT_PROG_LTMAIN
