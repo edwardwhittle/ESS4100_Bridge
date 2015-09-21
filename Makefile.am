@@ -1,3 +1,8 @@
 SUBDIRS = scripts src
 
+bin_PROGRAMS = hello_world
+
+hello_world_SOURCES = hello_world.c
+hello_world_CFLAGS = $(MODBUS_CFLAGS)
+hello_world_LDADD = $(MODBUS_LIBS)
 
