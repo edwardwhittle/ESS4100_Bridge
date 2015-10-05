@@ -65,12 +65,12 @@ hello_world-hello_world.o: hello_world.c /usr/include/stdc-predef.h \
  /usr/include/libbacnet/bacdevobjpropref.h \
  /usr/include/libbacnet/get_alarm_sum.h \
  /usr/include/libbacnet/alarm_ack.h /usr/include/libbacnet/datalink.h \
- /usr/include/libbacnet/bip.h /usr/include/libbacnet/npdu.h \
- /usr/include/libbacnet/net.h /usr/include/fcntl.h \
- /usr/include/bits/fcntl.h /usr/include/bits/fcntl-linux.h \
- /usr/include/bits/stat.h /usr/include/bits/fcntl2.h /usr/include/netdb.h \
- /usr/include/rpc/netdb.h /usr/include/bits/netdb.h \
- /usr/include/sys/stat.h /usr/include/unistd.h \
+ /usr/include/libbacnet/npdu.h /usr/include/libbacnet/bvlc.h \
+ /usr/include/libbacnet/bip.h /usr/include/libbacnet/net.h \
+ /usr/include/fcntl.h /usr/include/bits/fcntl.h \
+ /usr/include/bits/fcntl-linux.h /usr/include/bits/stat.h \
+ /usr/include/bits/fcntl2.h /usr/include/netdb.h /usr/include/rpc/netdb.h \
+ /usr/include/bits/netdb.h /usr/include/sys/stat.h /usr/include/unistd.h \
  /usr/include/bits/posix_opt.h /usr/include/bits/environments.h \
  /usr/include/bits/confname.h /usr/include/bits/unistd.h \
  /usr/include/sys/wait.h /usr/include/sys/un.h /usr/include/semaphore.h \
@@ -87,7 +87,6 @@ hello_world-hello_world.o: hello_world.c /usr/include/stdc-predef.h \
  /usr/include/asm-generic/ioctls.h /usr/include/linux/ioctl.h \
  /usr/include/asm/ioctl.h /usr/include/asm-generic/ioctl.h \
  /usr/include/bits/ioctl-types.h /usr/include/sys/ttydefaults.h \
- /usr/include/libbacnet/bvlc.h /usr/include/libbacnet/bvlc.h \
  /usr/include/libbacnet/client.h /usr/include/libbacnet/wpm.h \
  /usr/include/libbacnet/cov.h /usr/include/libbacnet/lso.h \
  /usr/include/libbacnet/txbuf.h /usr/include/libbacnet/datalink.h \
@@ -350,9 +349,11 @@ hello_world-hello_world.o: hello_world.c /usr/include/stdc-predef.h \
 
 /usr/include/libbacnet/datalink.h:
 
-/usr/include/libbacnet/bip.h:
-
 /usr/include/libbacnet/npdu.h:
+
+/usr/include/libbacnet/bvlc.h:
+
+/usr/include/libbacnet/bip.h:
 
 /usr/include/libbacnet/net.h:
 
@@ -443,10 +444,6 @@ hello_world-hello_world.o: hello_world.c /usr/include/stdc-predef.h \
 /usr/include/bits/ioctl-types.h:
 
 /usr/include/sys/ttydefaults.h:
-
-/usr/include/libbacnet/bvlc.h:
-
-/usr/include/libbacnet/bvlc.h:
 
 /usr/include/libbacnet/client.h:
 

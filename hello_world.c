@@ -35,6 +35,9 @@
 #define BACNET_BBMD_TTL 90
 #endif 
 
+#define NUM_LISTS 1
+
+
 
 /*Variables for Read Register*/
 uint16_t tab_reg[64];
@@ -42,16 +45,16 @@ int rc;
 int i;
 
 /* Linked list object */
-typedef struct s_word_object word_object;
+typedef struct s_number_object number_object;
 
 //Define a structure called s_word_object containing a string (char) and a pointer containing the address of the next box of this linked list (the next box is of the same type)
-struct s_word_object{
-	char *word;
-	word_object *next;
+struct s_number_object{
+	uint16_t number;
+	number_object *next;
 };
 
 //Create a pointer to store the memory location of the current variable
-static word_object *list_head;
+static number_object *list_heads[NUM_LISTS];
 
 /*Global Modbus Structure*/
 modbus_t *ctx;
@@ -61,94 +64,100 @@ pthread_mutex_t list_lock = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t  list_data_ready = PTHREAD_COND_INITIALIZER;
 pthread_cond_t  list_data_flush = PTHREAD_COND_INITIALIZER;
 
-/* If you are trying out the test suite from home, this data matches the data
- * * stored in RANDOM_DATA_POOL for device number 12
- * * BACnet client will print "Successful match" whenever it is able to receive
- * * this set of data. Note that you will not have access to the RANDOM_DATA_POOL
- * * for your final submitted application. */
+/*Create Timer Lock Mutex*/
+static pthread_mutex_t timer_lock = PTHREAD_MUTEX_INITIALIZER;
 
 static uint16_t test_data[] = {
 0xA4EC, 0x6E39, 0x8740, 0x1065, 0x9134, 0xFC8C };
 #define NUM_TEST_DATA (sizeof(test_data)/sizeof(test_data[0]))
 
-static pthread_mutex_t timer_lock = PTHREAD_MUTEX_INITIALIZER;
+static int Update_Analog_Input_Read_Property(BACNET_READ_PROPERTY_DATA *rpdata){
+	
+	static int index;
+	//int instance_no = bacnet_Analog_Input_Instance_To_Index(rpdata->object_instance);
 
-static int Update_Analog_Input_Read_Property(
-BACNET_READ_PROPERTY_DATA *rpdata) {
+	if (rpdata->object_property != bacnet_PROP_PRESENT_VALUE) goto not_pv;
 
-static int index;
-/* Update the values to be sent to the BACnet client here.
- * * The data should be read from the tail of a linked list. You are required
- * * to implement this list functionality.
- * *
- * * bacnet_Analog_Input_Present_Value_Set()
- * * First argument: Instance No
- * * Second argument: data to be sent
- * *
- * * Without reconfiguring libbacnet, a maximum of 4 values may be sent */
-bacnet_Analog_Input_Present_Value_Set(0, test_data[index++]);
-/* bacnet_Analog_Input_Present_Value_Set(1, test_data[index++]); */
-/* bacnet_Analog_Input_Present_Value_Set(2, test_data[index++]); */
-if (index == NUM_TEST_DATA) index = 0;
-return bacnet_Analog_Input_Read_Property(rpdata);
+	//printf("AI_Present_Value request for instance %i\n", instance_no);
+	/* Update the values to be sent to the BACnet client here.
+	 * * The data should be read from the tail of a linked list. You are required
+	 * * to implement this list functionality.
+	 * * bacnet_Analog_Input_Present_Value_Set()
+	 * * First argument: Instance No
+	 * * Second argument: data to be sent
+	 * * Without reconfiguring libbacnet, a maximum of 4 values may be sent */
+	bacnet_Analog_Input_Present_Value_Set(0, test_data[index++]);
+	/* bacnet_Analog_Input_Present_Value_Set(1, test_data[index++]); */
+	/* bacnet_Analog_Input_Present_Value_Set(2, test_data[index++]); */
+	/* bacnet_Analog_Input_Present_Value_Set(3, test_data[index++]); */	
+	if (index == NUM_TEST_DATA) index = 0;
+
+not_pv:
+	return bacnet_Analog_Input_Read_Property(rpdata);
 }
 
+/*Create BACnet Devices*/
 static bacnet_object_functions_t server_objects[] = {
-{bacnet_OBJECT_DEVICE,
-	NULL,
-	bacnet_Device_Count,
-	bacnet_Device_Index_To_Instance,
-	bacnet_Device_Valid_Object_Instance_Number,
-	bacnet_Device_Object_Name,
-	bacnet_Device_Read_Property_Local,
-	bacnet_Device_Write_Property_Local,
-	bacnet_Device_Property_Lists,
-	bacnet_DeviceGetRRInfo,
-	NULL, /* Iterator */
-	NULL, /* Value_Lists */
-	NULL, /* COV */
-	NULL, /* COV Clear */
-	NULL /* Intrinsic Reporting */
-},
-
-{bacnet_OBJECT_ANALOG_INPUT,
-	bacnet_Analog_Input_Init,
-	bacnet_Analog_Input_Count,
-	bacnet_Analog_Input_Index_To_Instance,
-	bacnet_Analog_Input_Valid_Instance,
-	bacnet_Analog_Input_Object_Name,
-	Update_Analog_Input_Read_Property,
-	bacnet_Analog_Input_Write_Property,
-	bacnet_Analog_Input_Property_Lists,
-	NULL /* ReadRangeInfo */ ,
-	NULL /* Iterator */ ,
-	bacnet_Analog_Input_Encode_Value_List,
-	bacnet_Analog_Input_Change_Of_Value,
-	bacnet_Analog_Input_Change_Of_Value_Clear,
-	bacnet_Analog_Input_Intrinsic_Reporting},
+	{bacnet_OBJECT_DEVICE,
+		NULL,
+		bacnet_Device_Count,
+		bacnet_Device_Index_To_Instance,
+		bacnet_Device_Valid_Object_Instance_Number,
+		bacnet_Device_Object_Name,
+		bacnet_Device_Read_Property_Local,
+		bacnet_Device_Write_Property_Local,
+		bacnet_Device_Property_Lists,
+		bacnet_DeviceGetRRInfo,
+		NULL, /* Iterator */
+		NULL, /* Value_Lists */
+		NULL, /* COV */
+		NULL, /* COV Clear */
+		NULL /* Intrinsic Reporting */
+	},
+	{bacnet_OBJECT_ANALOG_INPUT,
+		bacnet_Analog_Input_Init,
+		bacnet_Analog_Input_Count,
+		bacnet_Analog_Input_Index_To_Instance,
+		bacnet_Analog_Input_Valid_Instance,
+		bacnet_Analog_Input_Object_Name,
+		Update_Analog_Input_Read_Property,
+		bacnet_Analog_Input_Write_Property,
+		bacnet_Analog_Input_Property_Lists,
+		NULL /* ReadRangeInfo */ ,
+		NULL /* Iterator */ ,
+		bacnet_Analog_Input_Encode_Value_List,
+		bacnet_Analog_Input_Change_Of_Value,
+		bacnet_Analog_Input_Change_Of_Value_Clear,
+		bacnet_Analog_Input_Intrinsic_Reporting},
 	{MAX_BACNET_OBJECT_TYPE}
 };
 
 static void register_with_bbmd(void) {
 #if RUN_AS_BBMD_CLIENT
+
 /* Thread safety: Shares data with datalink_send_pdu */
+
 	bacnet_bvlc_register_with_bbmd(
-	bacnet_bip_getaddrbyname(BACNET_BBMD_ADDRESS),
-	htons(BACNET_BBMD_PORT),
-	BACNET_BBMD_TTL);
+		bacnet_bip_getaddrbyname(BACNET_BBMD_ADDRESS),
+		htons(BACNET_BBMD_PORT),
+		BACNET_BBMD_TTL);
 #endif
 }
 
 static void *minute_tick(void *arg) {
 	while (1) {
 		pthread_mutex_lock(&timer_lock);
+		
 		/* Expire addresses once the TTL has expired */
 		bacnet_address_cache_timer(60);
+		
 		/* Re-register with BBMD once BBMD TTL has expired */
 		register_with_bbmd();
+		
 		/* Update addresses for notification class recipient list
 		 * * Requred for INTRINSIC_REPORTING
 		 * * bacnet_Notification_Class_find_recipient(); */
+		
 		/* Sleep for 1 minute */
 		pthread_mutex_unlock(&timer_lock);
 		sleep(60);
@@ -208,33 +217,29 @@ static void ms_tick(void) {
 	bacnet_handler_##handler)		\
 
 /*Function to Add Register to List*/
-static void add_to_list(char *word) {
+static void add_to_list(number_object **list_head, uint16_t *number) {
 
 //Create a pointer to store the memory location of the last word
-	word_object *last_object, *tmp_object;
+	number_object *last_object, *tmp_object;
+	uint16_t tmp_number;
 
-	char *tmp_string = strdup(word);
-	tmp_object = malloc(sizeof(word_object));
+	tmp_number = *number;
+
+	tmp_object->number = tmp_number;
+	tmp_object->next = NULL;
 
 	pthread_mutex_lock(&list_lock);
 
-	if (list_head == NULL){
-		last_object = tmp_object;
-		list_head = last_object;
-		pthread_mutex_unlock(&list_lock);
+	if (*list_head == NULL){
+		*list_head = tmp_object;
 	}
-
 	else {
-		last_object = list_head;
+		last_object = *list_head;
 		while(last_object->next){
 			last_object = last_object->next;
 		}
 		last_object->next = tmp_object;
-		last_object = last_object->next;
 	}
-	last_object->word = tmp_string;
-	last_object->next = NULL;
-
 	pthread_mutex_unlock(&list_lock);
 	pthread_cond_signal(&list_data_ready);
 }
@@ -267,32 +272,34 @@ return 0;
 }
 
 /*Function to get the first item on the linked list*/
-static word_object *list_get_first(void){
-	word_object * first_object;
+static number_object *list_get_first(number_object **list_head){
+	number_object * first_object;
 
-	first_object = list_head;
-	list_head = list_head->next;
+	first_object = *list_head;
+	*list_head = (*list_head)->next;
 
 	return first_object;
 }
 
 /*Function to Print Linked List*/
 static void *print_func(void *arg){
-	word_object *current_object;
+	number_object **list_head = (number_object **) arg;
+	number_object *current_object;
+
 	while(1){
 		pthread_mutex_lock(&list_lock);
 
-		while(list_head == NULL){
+		while(*list_head == NULL){
 			pthread_cond_wait(&list_data_ready, &list_lock);
 		}
 
-		current_object = list_get_first();
+		current_object = list_get_first(list_head);
 
 		pthread_mutex_unlock(&list_lock);
 
-		printf("%s\n",current_object->word);
-		free(current_object->word);
-		free(current_object);
+		printf("%i\n",current_object->number);
+//		free(current_object->number);
+//		free(current_object);
 
 		pthread_cond_signal(&list_data_flush);
 	}
@@ -300,7 +307,8 @@ static void *print_func(void *arg){
 }
 
 /*Function to Flush the List of Remaining Items on the Linked List*/
-static void list_flush(void){
+/*
+static void list_flush(number_object *list_head){
 
 	pthread_mutex_lock(&list_lock);
 
@@ -311,13 +319,15 @@ static void list_flush(void){
 
 	pthread_mutex_unlock(&list_lock);
 }
-
-
+	
+*/
 /* Main Function */
-int main(void) {
+int main(int argc, char **argv) {
 
 uint8_t rx_buf[bacnet_MAX_MPDU];
 uint16_t pdu_len;
+
+/*Initialise BACnet Stack*/
 BACNET_ADDRESS src;
 pthread_t minute_tick_id, second_tick_id;
 
@@ -328,8 +338,9 @@ bacnet_address_init();
 
 bacnet_Device_Init(server_objects);
 BN_UNC(WHO_IS, who_is);
-BN_CON(READ_PROPERTY, read_property);
+BN_CON(READ_PROPERTY, read_property);//For Analog Reads
 
+/*Setup Network Stack*/
 bacnet_BIP_Debug = true;
 bacnet_bip_set_port(htons(BACNET_PORT));
 bacnet_datalink_set(BACNET_DATALINK_TYPE);
@@ -341,6 +352,7 @@ register_with_bbmd();
 
 bacnet_Send_I_Am(bacnet_Handler_Transmit_Buffer);
 
+/*Maintenance Timers*/
 pthread_create(&minute_tick_id, 0, minute_tick, NULL);
 pthread_create(&second_tick_id, 0, second_tick, NULL);
 
@@ -352,7 +364,7 @@ pthread_t print_thread;
 initmodbus();
 
 /*Create Thread*/
-pthread_create(&print_thread, NULL, print_func, NULL);
+pthread_create(&print_thread, NULL, print_func, &list_heads[0]);
 
 /*Read Registers*/
 	rc = modbus_read_registers(ctx, 0, 3,tab_reg);
@@ -362,18 +374,23 @@ pthread_create(&print_thread, NULL, print_func, NULL);
 		}
 		for (i=0; i < rc; i++) {
 		sprintf(reg_input,"reg[%d]=%d (0x%X)", i, tab_reg[i], tab_reg[i]);
-		add_to_list(reg_input);				   
+		printf("%s\n",reg_input);
+		/*add_to_list(&list_heads[0], reg_input);				   
+		add_to_list(&list_heads[1], reg_input);
+		add_to_list(&list_heads[2], reg_input);
+		add_to_list(&list_heads[3], reg_input);*/
 		}
-		list_flush();
+
 
 /*Close and Free Connection*/
 	modbus_close(ctx);
 	modbus_free(ctx);
 
+while(1){
 pdu_len = bacnet_datalink_receive(
 	&src, rx_buf, bacnet_MAX_MPDU, BACNET_SELECT_TIMEOUT_MS);
 
-if (pdu_len) {
+	if (pdu_len) {
 
 	/* May call any registered handler.
 	* Thread safety: May block, however we still need to guarantee
@@ -381,8 +398,11 @@ if (pdu_len) {
 	pthread_mutex_lock(&timer_lock);
 	bacnet_npdu_handler(&src, rx_buf, pdu_len);
 	pthread_mutex_unlock(&timer_lock);
-}										ms_tick();
-
+	}
+	
+	ms_tick();
+	}
 return 0;
-
 }
+
+
