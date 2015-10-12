@@ -22,7 +22,7 @@
 #include <libbacnet/ai.h>
 #include "src/bacnet_namespace.h"
 
-#define BACNET_INSTANCE_NO      12
+#define BACNET_INSTANCE_NO      34
 #define BACNET_PORT     0xBAC1
 #define BACNET_INTERFACE        "lo"
 #define BACNET_DATALINK_TYPE    "bvlc"
@@ -31,11 +31,11 @@
 
 #if RUN_AS_BBMD_CLIENT
 #define BACNET_BBMD_PORT        0xBAC0
-#define BACNET_BBMD_ADDRESS     "127.0.0.1"
+#define BACNET_BBMD_ADDRESS     "140.159.160.7"
 #define BACNET_BBMD_TTL 90
 #endif 
 
-#define NUM_LISTS 1
+#define NUM_LISTS 3
 
 
 
@@ -49,7 +49,7 @@ typedef struct s_number_object number_object;
 
 //Define a structure called s_word_object containing a string (char) and a pointer containing the address of the next box of this linked list (the next box is of the same type)
 struct s_number_object{
-	uint16_t number;
+	char number;
 	number_object *next;
 };
 
@@ -67,10 +67,6 @@ pthread_cond_t  list_data_flush = PTHREAD_COND_INITIALIZER;
 /*Create Timer Lock Mutex*/
 static pthread_mutex_t timer_lock = PTHREAD_MUTEX_INITIALIZER;
 
-static uint16_t test_data[] = {
-0xA4EC, 0x6E39, 0x8740, 0x1065, 0x9134, 0xFC8C };
-#define NUM_TEST_DATA (sizeof(test_data)/sizeof(test_data[0]))
-
 static int Update_Analog_Input_Read_Property(BACNET_READ_PROPERTY_DATA *rpdata){
 	
 	static int index;
@@ -86,11 +82,11 @@ static int Update_Analog_Input_Read_Property(BACNET_READ_PROPERTY_DATA *rpdata){
 	 * * First argument: Instance No
 	 * * Second argument: data to be sent
 	 * * Without reconfiguring libbacnet, a maximum of 4 values may be sent */
-	bacnet_Analog_Input_Present_Value_Set(0, test_data[index++]);
+	//bacnet_Analog_Input_Present_Value_Set(0, *number_object[0]);
 	/* bacnet_Analog_Input_Present_Value_Set(1, test_data[index++]); */
 	/* bacnet_Analog_Input_Present_Value_Set(2, test_data[index++]); */
 	/* bacnet_Analog_Input_Present_Value_Set(3, test_data[index++]); */	
-	if (index == NUM_TEST_DATA) index = 0;
+//if (index == number_object) index = 0;
 
 not_pv:
 	return bacnet_Analog_Input_Read_Property(rpdata);
@@ -217,31 +213,41 @@ static void ms_tick(void) {
 	bacnet_handler_##handler)		\
 
 /*Function to Add Register to List*/
-static void add_to_list(number_object **list_head, uint16_t *number) {
+static void add_to_list(number_object **list_head, char *number) {
 
 //Create a pointer to store the memory location of the last word
 	number_object *last_object, *tmp_object;
-	uint16_t tmp_number;
+	char *tmp_number;
 
-	tmp_number = *number;
-
+	tmp_object = malloc(sizeof(number_object));
+	tmp_number = strdup(number);
+	
+	/* Set up tmp_object outside of locking */
 	tmp_object->number = tmp_number;
 	tmp_object->next = NULL;
-
+	
 	pthread_mutex_lock(&list_lock);
-
-	if (*list_head == NULL){
+	
+	if (*list_head == NULL) {
+	/* The list is empty, just place our tmp_object at the head */
 		*list_head = tmp_object;
-	}
-	else {
+	} 
+	
+	else {	
+	/* Iterate through the linked list to find the last object */
 		last_object = *list_head;
-		while(last_object->next){
+		while (last_object->next) {
 			last_object = last_object->next;
 		}
-		last_object->next = tmp_object;
+	
+	/* Last object is now found, link in our tmp_object at the tail */
+	last_object->next = tmp_object;
 	}
+	
 	pthread_mutex_unlock(&list_lock);
 	pthread_cond_signal(&list_data_ready);
+	printf("Add to list function complete\n");
+
 }
 /*Initialise Modbus Structure*/
 static int initmodbus (void){					
@@ -367,41 +373,36 @@ initmodbus();
 pthread_create(&print_thread, NULL, print_func, &list_heads[0]);
 
 /*Read Registers*/
-	rc = modbus_read_registers(ctx, 0, 3,tab_reg);
+	rc = modbus_read_registers(ctx, 34, 4,tab_reg);
 	   	if (rc == -1) {
 			fprintf(stderr, "Read Register Failed: %s\n", modbus_strerror(errno));
 			return -1;
 		}
 		for (i=0; i < rc; i++) {
 		sprintf(reg_input,"reg[%d]=%d (0x%X)", i, tab_reg[i], tab_reg[i]);
-		printf("%s\n",reg_input);
-		/*add_to_list(&list_heads[0], reg_input);				   
-		add_to_list(&list_heads[1], reg_input);
-		add_to_list(&list_heads[2], reg_input);
-		add_to_list(&list_heads[3], reg_input);*/
+		printf("%s\n",reg_input);		
+		add_to_list(&list_heads[i], reg_input);
+		printf("Added string to list\n");
 		}
 
 
 /*Close and Free Connection*/
-	modbus_close(ctx);
-	modbus_free(ctx);
+modbus_close(ctx);
+modbus_free(ctx);
+
 
 while(1){
-pdu_len = bacnet_datalink_receive(
-	&src, rx_buf, bacnet_MAX_MPDU, BACNET_SELECT_TIMEOUT_MS);
-
+	pdu_len = bacnet_datalink_receive(&src, rx_buf, bacnet_MAX_MPDU, BACNET_SELECT_TIMEOUT_MS);
 	if (pdu_len) {
-
 	/* May call any registered handler.
 	* Thread safety: May block, however we still need to guarantee
 	* atomicity with the timers, so hold the lock anyway */
-	pthread_mutex_lock(&timer_lock);
-	bacnet_npdu_handler(&src, rx_buf, pdu_len);
-	pthread_mutex_unlock(&timer_lock);
+		pthread_mutex_lock(&timer_lock);
+		bacnet_npdu_handler(&src, rx_buf, pdu_len);
+		pthread_mutex_unlock(&timer_lock);
 	}
-	
 	ms_tick();
-	}
+}
 return 0;
 }
 
