@@ -69,7 +69,8 @@ static pthread_mutex_t timer_lock = PTHREAD_MUTEX_INITIALIZER;
 
 
 static int Update_Analog_Input_Read_Property(BACNET_READ_PROPERTY_DATA *rpdata){
-
+	int output;
+	number_object *current_object;
 	static int index;
 	//int instance_no = bacnet_Analog_Input_Instance_To_Index(rpdata->object_instance);
 	if (rpdata->object_property != bacnet_PROP_PRESENT_VALUE) goto not_pv;
@@ -83,11 +84,11 @@ static int Update_Analog_Input_Read_Property(BACNET_READ_PROPERTY_DATA *rpdata){
 	 * * First argument: Instance No
 	 * * Second argument: data to be sent
 	 * * Without reconfiguring libbacnet, a maximum of 4 values may be sent */
-	/*
-	bacnet_Analog_Input_Present_Value_Set(0, list_heads[0]);
-	bacnet_Analog_Input_Present_Value_Set(1, list_heads[1]); 
-	bacnet_Analog_Input_Present_Value_Set(2, list_heads[2]);
-	bacnet_Analog_Input_Present_Value_Set(3, list_heads[3]);*/
+	printf("Sending %i to Output 1\n",list_heads[0]->number);
+	bacnet_Analog_Input_Present_Value_Set(0, list_heads[0]->number);
+	bacnet_Analog_Input_Present_Value_Set(1, list_heads[1]->number); 
+	bacnet_Analog_Input_Present_Value_Set(2, list_heads[2]->number);
+	bacnet_Analog_Input_Present_Value_Set(3, list_heads[3]->number);
 //if (index == number_object) index = 0;
 
 not_pv:
@@ -370,9 +371,7 @@ initmodbus();
 		for (i=0; i < rc; i++) {
 		sprintf(reg_input,"reg[%d]=%d (0x%X)", i, tab_reg[i], tab_reg[i]);
 		printf("%s\n",reg_input);
-		printf("Trying to add %d to list\n",tab_reg[i]);
 		add_to_list(&list_heads[i], tab_reg[i]);
-		printf("Added number to list\n");
 		}
 
 
@@ -391,8 +390,7 @@ while(1){
 		bacnet_npdu_handler(&src, rx_buf, pdu_len);
 		pthread_mutex_unlock(&timer_lock);
 	}
-	ms_tick();
-}
+	ms_tick();}
 
 return 0;
 }
