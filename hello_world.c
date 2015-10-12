@@ -35,7 +35,7 @@
 #define BACNET_BBMD_TTL 90
 #endif 
 
-#define NUM_LISTS 3
+#define NUM_LISTS 4
 
 
 
@@ -47,9 +47,9 @@ int i;
 /* Linked list object */
 typedef struct s_number_object number_object;
 
-//Define a structure called s_word_object containing a string (char) and a pointer containing the address of the next box of this linked list (the next box is of the same type)
+//Define a structure called s_word_object containing a number (int) and a pointer containing the address of the next box of this linked list (the next box is of the same type)
 struct s_number_object{
-	char number;
+	int number;
 	number_object *next;
 };
 
@@ -67,14 +67,15 @@ pthread_cond_t  list_data_flush = PTHREAD_COND_INITIALIZER;
 /*Create Timer Lock Mutex*/
 static pthread_mutex_t timer_lock = PTHREAD_MUTEX_INITIALIZER;
 
+
 static int Update_Analog_Input_Read_Property(BACNET_READ_PROPERTY_DATA *rpdata){
-	
+
 	static int index;
 	//int instance_no = bacnet_Analog_Input_Instance_To_Index(rpdata->object_instance);
-
 	if (rpdata->object_property != bacnet_PROP_PRESENT_VALUE) goto not_pv;
 
 	//printf("AI_Present_Value request for instance %i\n", instance_no);
+	//
 	/* Update the values to be sent to the BACnet client here.
 	 * * The data should be read from the tail of a linked list. You are required
 	 * * to implement this list functionality.
@@ -82,10 +83,11 @@ static int Update_Analog_Input_Read_Property(BACNET_READ_PROPERTY_DATA *rpdata){
 	 * * First argument: Instance No
 	 * * Second argument: data to be sent
 	 * * Without reconfiguring libbacnet, a maximum of 4 values may be sent */
-	//bacnet_Analog_Input_Present_Value_Set(0, *number_object[0]);
-	/* bacnet_Analog_Input_Present_Value_Set(1, test_data[index++]); */
-	/* bacnet_Analog_Input_Present_Value_Set(2, test_data[index++]); */
-	/* bacnet_Analog_Input_Present_Value_Set(3, test_data[index++]); */	
+	/*
+	bacnet_Analog_Input_Present_Value_Set(0, list_heads[0]);
+	bacnet_Analog_Input_Present_Value_Set(1, list_heads[1]); 
+	bacnet_Analog_Input_Present_Value_Set(2, list_heads[2]);
+	bacnet_Analog_Input_Present_Value_Set(3, list_heads[3]);*/
 //if (index == number_object) index = 0;
 
 not_pv:
@@ -213,21 +215,20 @@ static void ms_tick(void) {
 	bacnet_handler_##handler)		\
 
 /*Function to Add Register to List*/
-static void add_to_list(number_object **list_head, char *number) {
+static void add_to_list(number_object **list_head, int number) {
 
 //Create a pointer to store the memory location of the last word
 	number_object *last_object, *tmp_object;
-	char *tmp_number;
+	int tmp_number;
 
-	tmp_object = malloc(sizeof(number_object));
-	tmp_number = strdup(number);
-	
-	/* Set up tmp_object outside of locking */
+	tmp_number = number;
+	tmp_object=malloc(sizeof(number_object));
 	tmp_object->number = tmp_number;
 	tmp_object->next = NULL;
 	
+
 	pthread_mutex_lock(&list_lock);
-	
+
 	if (*list_head == NULL) {
 	/* The list is empty, just place our tmp_object at the head */
 		*list_head = tmp_object;
@@ -246,9 +247,9 @@ static void add_to_list(number_object **list_head, char *number) {
 	
 	pthread_mutex_unlock(&list_lock);
 	pthread_cond_signal(&list_data_ready);
-	printf("Add to list function complete\n");
 
 }
+
 /*Initialise Modbus Structure*/
 static int initmodbus (void){					
 	ctx = modbus_new_tcp(SERVER_ADDR, SERVER_PORT);
@@ -288,6 +289,7 @@ static number_object *list_get_first(number_object **list_head){
 }
 
 /*Function to Print Linked List*/
+/*
 static void *print_func(void *arg){
 	number_object **list_head = (number_object **) arg;
 	number_object *current_object;
@@ -311,22 +313,9 @@ static void *print_func(void *arg){
 	}
 	return arg;
 }
-
-/*Function to Flush the List of Remaining Items on the Linked List*/
-/*
-static void list_flush(number_object *list_head){
-
-	pthread_mutex_lock(&list_lock);
-
-	while(list_head != NULL){
-		pthread_cond_signal(&list_data_ready);
-		pthread_cond_wait(&list_data_flush, &list_lock);
-	}
-
-	pthread_mutex_unlock(&list_lock);
-}
-	
 */
+
+
 /* Main Function */
 int main(int argc, char **argv) {
 
@@ -370,7 +359,7 @@ pthread_t print_thread;
 initmodbus();
 
 /*Create Thread*/
-pthread_create(&print_thread, NULL, print_func, &list_heads[0]);
+//pthread_create(&print_thread, NULL, print_func, &list_heads[0]);
 
 /*Read Registers*/
 	rc = modbus_read_registers(ctx, 34, 4,tab_reg);
@@ -380,9 +369,10 @@ pthread_create(&print_thread, NULL, print_func, &list_heads[0]);
 		}
 		for (i=0; i < rc; i++) {
 		sprintf(reg_input,"reg[%d]=%d (0x%X)", i, tab_reg[i], tab_reg[i]);
-		printf("%s\n",reg_input);		
-		add_to_list(&list_heads[i], reg_input);
-		printf("Added string to list\n");
+		printf("%s\n",reg_input);
+		printf("Trying to add %d to list\n",tab_reg[i]);
+		add_to_list(&list_heads[i], tab_reg[i]);
+		printf("Added number to list\n");
 		}
 
 
@@ -390,19 +380,20 @@ pthread_create(&print_thread, NULL, print_func, &list_heads[0]);
 modbus_close(ctx);
 modbus_free(ctx);
 
-
 while(1){
 	pdu_len = bacnet_datalink_receive(&src, rx_buf, bacnet_MAX_MPDU, BACNET_SELECT_TIMEOUT_MS);
 	if (pdu_len) {
+	
 	/* May call any registered handler.
 	* Thread safety: May block, however we still need to guarantee
 	* atomicity with the timers, so hold the lock anyway */
-		pthread_mutex_lock(&timer_lock);
+	pthread_mutex_lock(&timer_lock);
 		bacnet_npdu_handler(&src, rx_buf, pdu_len);
 		pthread_mutex_unlock(&timer_lock);
 	}
 	ms_tick();
 }
+
 return 0;
 }
 
