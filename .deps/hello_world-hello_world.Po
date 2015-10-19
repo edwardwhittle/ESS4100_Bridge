@@ -47,26 +47,37 @@ hello_world-hello_world.o: hello_world.c /usr/include/stdc-predef.h \
  /usr/include/bits/in.h /usr/include/errno.h /usr/include/bits/errno.h \
  /usr/include/linux/errno.h /usr/include/asm/errno.h \
  /usr/include/asm-generic/errno.h /usr/include/asm-generic/errno-base.h \
- /usr/include/libbacnet/address.h \
+ /usr/local/include/libbacnet/address.h \
  /usr/lib/gcc/x86_64-pc-linux-gnu/4.8.4/include/stdbool.h \
- /usr/include/libbacnet/bacdef.h /usr/include/libbacnet/bacenum.h \
- /usr/include/libbacnet/config.h /usr/include/libbacnet/readrange.h \
- /usr/include/libbacnet/bacstr.h /usr/include/libbacnet/datetime.h \
- /usr/include/libbacnet/device.h /usr/include/libbacnet/wp.h \
- /usr/include/libbacnet/bacdcode.h /usr/include/libbacnet/bacint.h \
- /usr/include/libbacnet/bacreal.h /usr/include/libbacnet/bits.h \
- /usr/include/libbacnet/bacapp.h /usr/include/libbacnet/lighting.h \
- /usr/include/libbacnet/rd.h /usr/include/libbacnet/rp.h \
- /usr/include/libbacnet/rpm.h /usr/include/libbacnet/proplist.h \
- /usr/include/libbacnet/handlers.h /usr/include/libbacnet/apdu.h \
- /usr/include/libbacnet/ptransfer.h /usr/include/libbacnet/getevent.h \
- /usr/include/libbacnet/timestamp.h /usr/include/libbacnet/event.h \
- /usr/include/libbacnet/bacpropstates.h \
- /usr/include/libbacnet/bacdevobjpropref.h \
- /usr/include/libbacnet/get_alarm_sum.h \
- /usr/include/libbacnet/alarm_ack.h /usr/include/libbacnet/datalink.h \
- /usr/include/libbacnet/npdu.h /usr/include/libbacnet/bvlc.h \
- /usr/include/libbacnet/bip.h /usr/include/libbacnet/net.h \
+ /usr/local/include/libbacnet/bacdef.h \
+ /usr/local/include/libbacnet/bacenum.h \
+ /usr/local/include/libbacnet/config.h \
+ /usr/local/include/libbacnet/readrange.h \
+ /usr/local/include/libbacnet/bacstr.h \
+ /usr/local/include/libbacnet/datetime.h \
+ /usr/local/include/libbacnet/device.h /usr/local/include/libbacnet/wp.h \
+ /usr/local/include/libbacnet/bacdcode.h \
+ /usr/local/include/libbacnet/bacint.h \
+ /usr/local/include/libbacnet/bacreal.h \
+ /usr/local/include/libbacnet/bits.h \
+ /usr/local/include/libbacnet/bacapp.h \
+ /usr/local/include/libbacnet/lighting.h \
+ /usr/local/include/libbacnet/rd.h /usr/local/include/libbacnet/rp.h \
+ /usr/local/include/libbacnet/rpm.h \
+ /usr/local/include/libbacnet/proplist.h \
+ /usr/local/include/libbacnet/handlers.h \
+ /usr/local/include/libbacnet/apdu.h \
+ /usr/local/include/libbacnet/ptransfer.h \
+ /usr/local/include/libbacnet/getevent.h \
+ /usr/local/include/libbacnet/timestamp.h \
+ /usr/local/include/libbacnet/event.h \
+ /usr/local/include/libbacnet/bacpropstates.h \
+ /usr/local/include/libbacnet/bacdevobjpropref.h \
+ /usr/local/include/libbacnet/get_alarm_sum.h \
+ /usr/local/include/libbacnet/alarm_ack.h \
+ /usr/local/include/libbacnet/datalink.h \
+ /usr/local/include/libbacnet/npdu.h /usr/local/include/libbacnet/bvlc.h \
+ /usr/local/include/libbacnet/bip.h /usr/local/include/libbacnet/net.h \
  /usr/include/fcntl.h /usr/include/bits/fcntl.h \
  /usr/include/bits/fcntl-linux.h /usr/include/bits/stat.h \
  /usr/include/bits/fcntl2.h /usr/include/netdb.h /usr/include/rpc/netdb.h \
@@ -87,10 +98,11 @@ hello_world-hello_world.o: hello_world.c /usr/include/stdc-predef.h \
  /usr/include/asm-generic/ioctls.h /usr/include/linux/ioctl.h \
  /usr/include/asm/ioctl.h /usr/include/asm-generic/ioctl.h \
  /usr/include/bits/ioctl-types.h /usr/include/sys/ttydefaults.h \
- /usr/include/libbacnet/client.h /usr/include/libbacnet/wpm.h \
- /usr/include/libbacnet/cov.h /usr/include/libbacnet/lso.h \
- /usr/include/libbacnet/txbuf.h /usr/include/libbacnet/datalink.h \
- /usr/include/libbacnet/tsm.h /usr/include/libbacnet/ai.h \
+ /usr/local/include/libbacnet/client.h /usr/local/include/libbacnet/wpm.h \
+ /usr/local/include/libbacnet/cov.h /usr/local/include/libbacnet/lso.h \
+ /usr/local/include/libbacnet/txbuf.h \
+ /usr/local/include/libbacnet/datalink.h \
+ /usr/local/include/libbacnet/tsm.h /usr/local/include/libbacnet/ai.h \
  src/bacnet_namespace.h
 
 /usr/include/stdc-predef.h:
@@ -287,75 +299,75 @@ hello_world-hello_world.o: hello_world.c /usr/include/stdc-predef.h \
 
 /usr/include/asm-generic/errno-base.h:
 
-/usr/include/libbacnet/address.h:
+/usr/local/include/libbacnet/address.h:
 
 /usr/lib/gcc/x86_64-pc-linux-gnu/4.8.4/include/stdbool.h:
 
-/usr/include/libbacnet/bacdef.h:
+/usr/local/include/libbacnet/bacdef.h:
 
-/usr/include/libbacnet/bacenum.h:
+/usr/local/include/libbacnet/bacenum.h:
 
-/usr/include/libbacnet/config.h:
+/usr/local/include/libbacnet/config.h:
 
-/usr/include/libbacnet/readrange.h:
+/usr/local/include/libbacnet/readrange.h:
 
-/usr/include/libbacnet/bacstr.h:
+/usr/local/include/libbacnet/bacstr.h:
 
-/usr/include/libbacnet/datetime.h:
+/usr/local/include/libbacnet/datetime.h:
 
-/usr/include/libbacnet/device.h:
+/usr/local/include/libbacnet/device.h:
 
-/usr/include/libbacnet/wp.h:
+/usr/local/include/libbacnet/wp.h:
 
-/usr/include/libbacnet/bacdcode.h:
+/usr/local/include/libbacnet/bacdcode.h:
 
-/usr/include/libbacnet/bacint.h:
+/usr/local/include/libbacnet/bacint.h:
 
-/usr/include/libbacnet/bacreal.h:
+/usr/local/include/libbacnet/bacreal.h:
 
-/usr/include/libbacnet/bits.h:
+/usr/local/include/libbacnet/bits.h:
 
-/usr/include/libbacnet/bacapp.h:
+/usr/local/include/libbacnet/bacapp.h:
 
-/usr/include/libbacnet/lighting.h:
+/usr/local/include/libbacnet/lighting.h:
 
-/usr/include/libbacnet/rd.h:
+/usr/local/include/libbacnet/rd.h:
 
-/usr/include/libbacnet/rp.h:
+/usr/local/include/libbacnet/rp.h:
 
-/usr/include/libbacnet/rpm.h:
+/usr/local/include/libbacnet/rpm.h:
 
-/usr/include/libbacnet/proplist.h:
+/usr/local/include/libbacnet/proplist.h:
 
-/usr/include/libbacnet/handlers.h:
+/usr/local/include/libbacnet/handlers.h:
 
-/usr/include/libbacnet/apdu.h:
+/usr/local/include/libbacnet/apdu.h:
 
-/usr/include/libbacnet/ptransfer.h:
+/usr/local/include/libbacnet/ptransfer.h:
 
-/usr/include/libbacnet/getevent.h:
+/usr/local/include/libbacnet/getevent.h:
 
-/usr/include/libbacnet/timestamp.h:
+/usr/local/include/libbacnet/timestamp.h:
 
-/usr/include/libbacnet/event.h:
+/usr/local/include/libbacnet/event.h:
 
-/usr/include/libbacnet/bacpropstates.h:
+/usr/local/include/libbacnet/bacpropstates.h:
 
-/usr/include/libbacnet/bacdevobjpropref.h:
+/usr/local/include/libbacnet/bacdevobjpropref.h:
 
-/usr/include/libbacnet/get_alarm_sum.h:
+/usr/local/include/libbacnet/get_alarm_sum.h:
 
-/usr/include/libbacnet/alarm_ack.h:
+/usr/local/include/libbacnet/alarm_ack.h:
 
-/usr/include/libbacnet/datalink.h:
+/usr/local/include/libbacnet/datalink.h:
 
-/usr/include/libbacnet/npdu.h:
+/usr/local/include/libbacnet/npdu.h:
 
-/usr/include/libbacnet/bvlc.h:
+/usr/local/include/libbacnet/bvlc.h:
 
-/usr/include/libbacnet/bip.h:
+/usr/local/include/libbacnet/bip.h:
 
-/usr/include/libbacnet/net.h:
+/usr/local/include/libbacnet/net.h:
 
 /usr/include/fcntl.h:
 
@@ -445,20 +457,20 @@ hello_world-hello_world.o: hello_world.c /usr/include/stdc-predef.h \
 
 /usr/include/sys/ttydefaults.h:
 
-/usr/include/libbacnet/client.h:
+/usr/local/include/libbacnet/client.h:
 
-/usr/include/libbacnet/wpm.h:
+/usr/local/include/libbacnet/wpm.h:
 
-/usr/include/libbacnet/cov.h:
+/usr/local/include/libbacnet/cov.h:
 
-/usr/include/libbacnet/lso.h:
+/usr/local/include/libbacnet/lso.h:
 
-/usr/include/libbacnet/txbuf.h:
+/usr/local/include/libbacnet/txbuf.h:
 
-/usr/include/libbacnet/datalink.h:
+/usr/local/include/libbacnet/datalink.h:
 
-/usr/include/libbacnet/tsm.h:
+/usr/local/include/libbacnet/tsm.h:
 
-/usr/include/libbacnet/ai.h:
+/usr/local/include/libbacnet/ai.h:
 
 src/bacnet_namespace.h:

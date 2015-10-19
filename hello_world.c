@@ -64,21 +64,35 @@ static pthread_mutex_t timer_lock = PTHREAD_MUTEX_INITIALIZER;
 
 static int Update_Analog_Input_Read_Property(BACNET_READ_PROPERTY_DATA *rpdata){
 	int output;
-	number_object *current_object;
-	static int index;
+	static int idx;
+	
 	//int instance_no = bacnet_Analog_Input_Instance_To_Index(rpdata->object_instance);
+	
 	if (rpdata->object_property != bacnet_PROP_PRESENT_VALUE) goto not_pv;
-
+	
 	//printf("AI_Present_Value request for instance %i\n", instance_no);
+	
 	pthread_mutex_lock(&list_lock);
 
+	for(idx=0; idx<4; idx++){
+		output = list_get_first(list_heads[idx]);
+		bacnet_Analog_Input_Present_Value_Set(0, output);
+		
+	}
+	
+	/*
+	
 	bacnet_Analog_Input_Present_Value_Set(0, list_heads[0]->number);
 	bacnet_Analog_Input_Present_Value_Set(1, list_heads[1]->number); 
 	bacnet_Analog_Input_Present_Value_Set(2, list_heads[2]->number);
 	bacnet_Analog_Input_Present_Value_Set(3, list_heads[3]->number);
+	
 	printf("Values Sent: %i %i %i %i\n",list_heads[0]->number, list_heads[1]->number, list_heads[2]->number, list_heads[3]->number);
+	*/
+	
 	pthread_mutex_unlock(&list_lock);
-//if (index == number_object) index = 0;
+
+	//if (index == number_object) index = 0;
 
 not_pv:
 	return bacnet_Analog_Input_Read_Property(rpdata);
@@ -238,6 +252,13 @@ static void add_to_list(number_object **list_head, int number) {
 	pthread_mutex_unlock(&list_lock);
 	pthread_cond_signal(&list_data_ready);
 
+}
+
+static number_object *list_get_first(number_object **list_heads){
+	number_object *first_object;
+	first_object = *list_heads;
+	*list_heads = (*list_heads)->next;
+	return first_object;
 }
 
 /*Initialise Modbus Structure*/
