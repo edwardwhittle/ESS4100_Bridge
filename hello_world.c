@@ -123,13 +123,13 @@ static int Update_Analog_Input_Read_Property(BACNET_READ_PROPERTY_DATA *rpdata){
 		pthread_mutex_lock(&list_lock);
 
 		bacnet_Analog_Input_Present_Value_Set(0, output[0]);
-		//printf("Output 0 is %i\n",output[0]);
+		printf("Output 0 is %i\n",output[0]);
 		bacnet_Analog_Input_Present_Value_Set(1, output[1]); 
-		//printf("Output 1 is %i\n",output[1]);
+		printf("Output 1 is %i\n",output[1]);
 		bacnet_Analog_Input_Present_Value_Set(2, output[2]);
-		//printf("Output 2 is %i\n",output[2]);
+		printf("Output 2 is %i\n",output[2]);
 		bacnet_Analog_Input_Present_Value_Set(3, output[3]);
-		//printf("Output 3 is %i\n",output[3]);
+		printf("Output 3 is %i\n",output[3]);
 
 		pthread_mutex_unlock(&list_lock);
 		data_ready = 0;
@@ -316,7 +316,7 @@ static void *read_register(void *arg){
 		}
 		for (i=0; i < rc; i++) {
 			sprintf(reg_input,"reg[%d]=%d (0x%X)", i, tab_reg[i], tab_reg[i]);
-			//printf("%s\n",reg_input);
+			printf("%s\n",reg_input);
 			add_to_list(&list_heads[i], tab_reg[i]);
 			data_ready = 1;
 			if(output[i] != list_heads[i]->number){
