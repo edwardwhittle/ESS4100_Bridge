@@ -62,9 +62,52 @@ pthread_cond_t  list_data_flush = PTHREAD_COND_INITIALIZER;
 static pthread_mutex_t timer_lock = PTHREAD_MUTEX_INITIALIZER;
 
 
+/*Function to Add Register to List*/
+static void add_to_list(number_object **list_head, int number) {
+
+	/*Create a pointer to store the memory location of the last word*/
+	number_object *last_object, *tmp_object;
+	int tmp_number;
+	
+	tmp_number = number;
+	tmp_object=malloc(sizeof(number_object));
+	tmp_object->number = tmp_number;
+	tmp_object->next = NULL;
+	
+	pthread_mutex_lock(&list_lock);
+	
+	if (*list_head == NULL){
+		/* The list is empty, just place our tmp_object at the head */
+		*list_head = tmp_object;
+	}
+	else{
+		/* Iterate through the linked list to find the last object */
+		last_object = *list_head;
+		while (last_object->next) {
+			last_object = last_object->next;
+		}
+		/* Last object is now found, link in the tmp_object at the tail */
+		last_object->next = tmp_object;
+	}
+
+	pthread_mutex_unlock(&list_lock);
+	pthread_cond_signal(&list_data_ready);
+}
+
+static number_object *list_get_first(number_object **list_heads){
+        number_object *first_object;
+	first_object = *list_heads;
+	*list_heads = (*list_heads)->next;
+	return first_object;
+}
+
+
+
 static int Update_Analog_Input_Read_Property(BACNET_READ_PROPERTY_DATA *rpdata){
+
+	number_object *current_object;
 	int output;
-	static int idx;
+	int idx;
 	
 	//int instance_no = bacnet_Analog_Input_Instance_To_Index(rpdata->object_instance);
 	
@@ -74,22 +117,16 @@ static int Update_Analog_Input_Read_Property(BACNET_READ_PROPERTY_DATA *rpdata){
 	
 	pthread_mutex_lock(&list_lock);
 
-	for(idx=0; idx<4; idx++){
-		output = list_get_first(list_heads[idx]);
-		bacnet_Analog_Input_Present_Value_Set(0, output);
-		
-	}
+	current_object = list_get_first(list_heads);
+		output = current_object->number;
+		printf("Output is %i\n",output);
 	
-	/*
-	
-	bacnet_Analog_Input_Present_Value_Set(0, list_heads[0]->number);
-	bacnet_Analog_Input_Present_Value_Set(1, list_heads[1]->number); 
-	bacnet_Analog_Input_Present_Value_Set(2, list_heads[2]->number);
-	bacnet_Analog_Input_Present_Value_Set(3, list_heads[3]->number);
-	
-	printf("Values Sent: %i %i %i %i\n",list_heads[0]->number, list_heads[1]->number, list_heads[2]->number, list_heads[3]->number);
-	*/
-	
+
+	bacnet_Analog_Input_Present_Value_Set(0, output);
+	bacnet_Analog_Input_Present_Value_Set(1, output); 
+	bacnet_Analog_Input_Present_Value_Set(2, output);
+	bacnet_Analog_Input_Present_Value_Set(3, output);
+
 	pthread_mutex_unlock(&list_lock);
 
 	//if (index == number_object) index = 0;
@@ -218,48 +255,6 @@ static void ms_tick(void) {
 	SERVICE_CONFIRMED_##service,		\
 	bacnet_handler_##handler)		\
 
-/*Function to Add Register to List*/
-static void add_to_list(number_object **list_head, int number) {
-
-//Create a pointer to store the memory location of the last word
-	number_object *last_object, *tmp_object;
-	int tmp_number;
-
-	tmp_number = number;
-	tmp_object=malloc(sizeof(number_object));
-	tmp_object->number = tmp_number;
-	tmp_object->next = NULL;
-	
-
-	pthread_mutex_lock(&list_lock);
-
-	if (*list_head == NULL) {
-	/* The list is empty, just place our tmp_object at the head */
-		*list_head = tmp_object;
-	} 
-	
-	else {	
-	/* Iterate through the linked list to find the last object */
-		last_object = *list_head;
-		while (last_object->next) {
-			last_object = last_object->next;
-		}
-	
-	/* Last object is now found, link in our tmp_object at the tail */
-	last_object->next = tmp_object;
-	}
-	
-	pthread_mutex_unlock(&list_lock);
-	pthread_cond_signal(&list_data_ready);
-
-}
-
-static number_object *list_get_first(number_object **list_heads){
-	number_object *first_object;
-	first_object = *list_heads;
-	*list_heads = (*list_heads)->next;
-	return first_object;
-}
 
 /*Initialise Modbus Structure*/
 static int initmodbus (void){					
@@ -314,6 +309,7 @@ char reg_input[256];
 			sprintf(reg_input,"reg[%d]=%d (0x%X)", i, tab_reg[i], tab_reg[i]);
 			printf("%s\n",reg_input);
 			add_to_list(&list_heads[i], tab_reg[i]);
+			printf("%i\n",list_heads[i]->number);
 		}
 		usleep(100000);
 	}
