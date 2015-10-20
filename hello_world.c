@@ -20,7 +20,7 @@
 #include <libbacnet/txbuf.h>
 #include <libbacnet/tsm.h>
 #include <libbacnet/ai.h>
-#include "src/bacnet_namespace.h"
+#include "bacnet_namespace.h"
 
 #define BACNET_INSTANCE_NO      34
 #define BACNET_PORT     0xBAC1

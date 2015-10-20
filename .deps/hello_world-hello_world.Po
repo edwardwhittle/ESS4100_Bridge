@@ -103,7 +103,7 @@ hello_world-hello_world.o: hello_world.c /usr/include/stdc-predef.h \
  /usr/local/include/libbacnet/txbuf.h \
  /usr/local/include/libbacnet/datalink.h \
  /usr/local/include/libbacnet/tsm.h /usr/local/include/libbacnet/ai.h \
- src/bacnet_namespace.h
+ bacnet_namespace.h
 
 /usr/include/stdc-predef.h:
 
@@ -473,4 +473,4 @@ hello_world-hello_world.o: hello_world.c /usr/include/stdc-predef.h \
 
 /usr/local/include/libbacnet/ai.h:
 
-src/bacnet_namespace.h:
+bacnet_namespace.h:
