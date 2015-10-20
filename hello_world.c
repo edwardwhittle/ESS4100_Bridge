@@ -40,13 +40,13 @@
 /* Linked list object */
 typedef struct s_number_object number_object;
 
-//Define a structure called s_word_object containing a number (int) and a pointer containing the address of the next box of this linked list (the next box is of the same type)
+/*Define a structure called s_word_object containing a number (int) and a pointer containing the address of the next box of this linked list (the next box is of the same type)*/
 struct s_number_object{
 	int number;
 	number_object *next;
 };
 
-//Create a pointer to store the memory location of the current variable
+/*Create a pointer to store the memory location of the current variable*/
 static number_object *list_heads[NUM_LISTS];
 
 /*Global Modbus Structure*/
@@ -61,9 +61,13 @@ pthread_cond_t  list_data_flush = PTHREAD_COND_INITIALIZER;
 /*Create Timer Lock Mutex*/
 static pthread_mutex_t timer_lock = PTHREAD_MUTEX_INITIALIZER;
 
+/*Global Output variables*/
+int output [NUM_LISTS];
+int data_ready = 0;
+
 
 /*Function to Add Register to List*/
-static void add_to_list(number_object **list_head, int number) {
+static void add_to_list(number_object **list_heads, int number) {
 
 	/*Create a pointer to store the memory location of the last word*/
 	number_object *last_object, *tmp_object;
@@ -76,13 +80,13 @@ static void add_to_list(number_object **list_head, int number) {
 	
 	pthread_mutex_lock(&list_lock);
 	
-	if (*list_head == NULL){
+	if (*list_heads == NULL){
 		/* The list is empty, just place our tmp_object at the head */
-		*list_head = tmp_object;
+		*list_heads = tmp_object;
 	}
 	else{
 		/* Iterate through the linked list to find the last object */
-		last_object = *list_head;
+		last_object = *list_heads;
 		while (last_object->next) {
 			last_object = last_object->next;
 		}
@@ -94,20 +98,20 @@ static void add_to_list(number_object **list_head, int number) {
 	pthread_cond_signal(&list_data_ready);
 }
 
+/*List Get First Function (Not Used Yet)*/
+/*
 static number_object *list_get_first(number_object **list_heads){
         number_object *first_object;
 	first_object = *list_heads;
+	printf("First Object is: %i\n",first_object->number);
 	*list_heads = (*list_heads)->next;
 	return first_object;
 }
+*/
 
-
-
+/*Analog Output Function*/
 static int Update_Analog_Input_Read_Property(BACNET_READ_PROPERTY_DATA *rpdata){
-
 	number_object *current_object;
-	int output;
-	int idx;
 	
 	//int instance_no = bacnet_Analog_Input_Instance_To_Index(rpdata->object_instance);
 	
@@ -115,22 +119,21 @@ static int Update_Analog_Input_Read_Property(BACNET_READ_PROPERTY_DATA *rpdata){
 	
 	//printf("AI_Present_Value request for instance %i\n", instance_no);
 	
-	pthread_mutex_lock(&list_lock);
+	if(data_ready == 1){
+		pthread_mutex_lock(&list_lock);
 
-	current_object = list_get_first(list_heads);
-		output = current_object->number;
-		printf("Output is %i\n",output);
-	
+		bacnet_Analog_Input_Present_Value_Set(0, output[0]);
+		//printf("Output 0 is %i\n",output[0]);
+		bacnet_Analog_Input_Present_Value_Set(1, output[1]); 
+		//printf("Output 1 is %i\n",output[1]);
+		bacnet_Analog_Input_Present_Value_Set(2, output[2]);
+		//printf("Output 2 is %i\n",output[2]);
+		bacnet_Analog_Input_Present_Value_Set(3, output[3]);
+		//printf("Output 3 is %i\n",output[3]);
 
-	bacnet_Analog_Input_Present_Value_Set(0, output);
-	bacnet_Analog_Input_Present_Value_Set(1, output); 
-	bacnet_Analog_Input_Present_Value_Set(2, output);
-	bacnet_Analog_Input_Present_Value_Set(3, output);
-
-	pthread_mutex_unlock(&list_lock);
-
-	//if (index == number_object) index = 0;
-
+		pthread_mutex_unlock(&list_lock);
+		data_ready = 0;
+	}
 not_pv:
 	return bacnet_Analog_Input_Read_Property(rpdata);
 }
@@ -171,6 +174,7 @@ static bacnet_object_functions_t server_objects[] = {
 	{MAX_BACNET_OBJECT_TYPE}
 };
 
+/*Register with BACnet/IP Broadcast Management Service*/
 static void register_with_bbmd(void) {
 #if RUN_AS_BBMD_CLIENT
 
@@ -183,6 +187,7 @@ static void register_with_bbmd(void) {
 #endif
 }
 
+/*Minute Count Funtion*/
 static void *minute_tick(void *arg) {
 	while (1) {
 		pthread_mutex_lock(&timer_lock);
@@ -204,6 +209,7 @@ static void *minute_tick(void *arg) {
 return arg;
 }
 
+/*Second Count Function*/
 static void *second_tick(void *arg) {
 	while (1) {
 	pthread_mutex_lock(&timer_lock);
@@ -239,6 +245,7 @@ static void *second_tick(void *arg) {
 return arg;								
 }
 
+/*Microsecond Function*/
 static void ms_tick(void) {
     /* Updates change of value COV subscribers.
      * Required for SERVICE_CONFIRMED_SUBSCRIBE_COV
@@ -258,6 +265,8 @@ static void ms_tick(void) {
 
 /*Initialise Modbus Structure*/
 static int initmodbus (void){					
+	/*Reinitialisation Marker*/
+
 	reinit:
 	ctx = modbus_new_tcp(SERVER_ADDR, SERVER_PORT);
 	if (ctx == NULL){
@@ -276,7 +285,7 @@ static int initmodbus (void){
 	else{
 		fprintf(stderr, "Libmodbus Context Created\n");
 	}
-/*Connect to Server*/
+	/*Connect to Server*/
 	if (modbus_connect(ctx) == -1) {
 	               fprintf(stderr, "Connection failed: %s\n", modbus_strerror(errno));
 		       sleep(1);
@@ -289,13 +298,13 @@ static int initmodbus (void){
 return 0;
 }
 
-/*Read Registers*/
+/*Read Registers Function*/
 static void *read_register(void *arg){
 
-uint16_t tab_reg[64];
-int rc;
-int i;
-char reg_input[256];
+	uint16_t tab_reg[64];
+	int rc;
+	int i;
+	char reg_input[256];
 
 	while(1){
 		rc = modbus_read_registers(ctx, 34, 4,tab_reg);
@@ -307,9 +316,13 @@ char reg_input[256];
 		}
 		for (i=0; i < rc; i++) {
 			sprintf(reg_input,"reg[%d]=%d (0x%X)", i, tab_reg[i], tab_reg[i]);
-			printf("%s\n",reg_input);
+			//printf("%s\n",reg_input);
 			add_to_list(&list_heads[i], tab_reg[i]);
-			printf("%i\n",list_heads[i]->number);
+			data_ready = 1;
+			if(output[i] != list_heads[i]->number){
+				output[i] = list_heads[i]->number;
+			}
+			free(list_heads[i]);
 		}
 		usleep(100000);
 	}
