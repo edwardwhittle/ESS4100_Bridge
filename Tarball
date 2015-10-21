@@ -1,0 +1,3 @@
+tar -cvf 4059767bridge.tar project1
+
+Execute this at the home command to create a Tarball
