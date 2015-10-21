@@ -27,6 +27,7 @@
 #define BACNET_INTERFACE        "lo"
 #define BACNET_DATALINK_TYPE    "bvlc"
 #define BACNET_SELECT_TIMEOUT_MS 1      /* ms */
+
 #define RUN_AS_BBMD_CLIENT      1
 
 #if RUN_AS_BBMD_CLIENT
@@ -60,10 +61,6 @@ pthread_cond_t  list_data_flush = PTHREAD_COND_INITIALIZER;
 
 /*Create Timer Lock Mutex*/
 static pthread_mutex_t timer_lock = PTHREAD_MUTEX_INITIALIZER;
-
-/*Global Output variables*/
-int output [NUM_LISTS];
-int data_ready = 0;
 
 
 /*Function to Add Register to List*/
@@ -99,41 +96,70 @@ static void add_to_list(number_object **list_heads, int number) {
 }
 
 /*List Get First Function (Not Used Yet)*/
-/*
 static number_object *list_get_first(number_object **list_heads){
         number_object *first_object;
 	first_object = *list_heads;
-	printf("First Object is: %i\n",first_object->number);
 	*list_heads = (*list_heads)->next;
 	return first_object;
 }
+/*
+static bacnet_object_functions_t server_objects[] = {
+        {bacnet_OBJECT_DEVICE,
+	                NULL,
+			bacnet_Device_Count,		                
+			bacnet_Device_Index_To_Instance,
+			bacnet_Device_Valid_Object_Instance_Number,
+	                bacnet_Device_Object_Name,
+	                bacnet_Device_Read_Property_Local,
+	                bacnet_Device_Write_Property_Local,
+	                bacnet_Device_Property_Lists,
+			bacnet_DeviceGetRRInfo,																      NULL,*/ /* Iterator */
+			//NULL, /* Value_Lists */
+			//NULL, /* COV */	
+			//NULL, /* COV Clear */
+			//NULL /* Intrinsic Reporting */	
+	//},
+/*	{bacnet_OBJECT_ANALOG_INPUT,
+			bacnet_Analog_Input_Init,
+			bacnet_Analog_Input_Count,
+			bacnet_Analog_Input_Index_To_Instance,
+			bacnet_Analog_Input_Valid_Instance,
+			bacnet_Analog_Input_Object_Name,
+			Update_Analog_Input_Read_Property,
+			bacnet_Analog_Input_Write_Property,
+			bacnet_Analog_Input_Property_Lists,
+			NULL*/ /* ReadRangeInfo */// ,
+			//NULL /* Iterator */ ,
+/*			bacnet_Analog_Input_Encode_Value_List,
+			bacnet_Analog_Input_Change_Of_Value,
+			bacnet_Analog_Input_Change_Of_Value_Clear,
+			bacnet_Analog_Input_Intrinsic_Reporting},
+	{MAX_BACNET_OBJECT_TYPE}
+};
 */
-
 /*Analog Output Function*/
 static int Update_Analog_Input_Read_Property(BACNET_READ_PROPERTY_DATA *rpdata){
+	
 	number_object *current_object;
 	
-	//int instance_no = bacnet_Analog_Input_Instance_To_Index(rpdata->object_instance);
+	int instance_no = bacnet_Analog_Input_Index_To_Instance(rpdata->object_instance);
 	
 	if (rpdata->object_property != bacnet_PROP_PRESENT_VALUE) goto not_pv;
 	
-	//printf("AI_Present_Value request for instance %i\n", instance_no);
+	printf("AI_Present_Value request for instance %i\n", instance_no);
 	
-	if(data_ready == 1){
-		pthread_mutex_lock(&list_lock);
+	pthread_mutex_lock(&list_lock);
 
-		bacnet_Analog_Input_Present_Value_Set(0, output[0]);
-		printf("Output 0 is %i\n",output[0]);
-		bacnet_Analog_Input_Present_Value_Set(1, output[1]); 
-		printf("Output 1 is %i\n",output[1]);
-		bacnet_Analog_Input_Present_Value_Set(2, output[2]);
-		printf("Output 2 is %i\n",output[2]);
-		bacnet_Analog_Input_Present_Value_Set(3, output[3]);
-		printf("Output 3 is %i\n",output[3]);
-
-		pthread_mutex_unlock(&list_lock);
-		data_ready = 0;
+	if(list_heads[instance_no]){
+		current_object = list_get_first(&list_heads[instance_no]);
 	}
+
+	bacnet_Analog_Input_Present_Value_Set(instance_no, current_object->number);
+	printf("Output %i is %i\n",instance_no,current_object->number);
+	free(current_object);
+
+	pthread_mutex_unlock(&list_lock);
+
 not_pv:
 	return bacnet_Analog_Input_Read_Property(rpdata);
 }
@@ -154,7 +180,7 @@ static bacnet_object_functions_t server_objects[] = {
 		NULL, /* Value_Lists */
 		NULL, /* COV */
 		NULL, /* COV Clear */
-		NULL /* Intrinsic Reporting */
+		NULL /* Intrinsic Reporting */	
 	},
 	{bacnet_OBJECT_ANALOG_INPUT,
 		bacnet_Analog_Input_Init,
@@ -318,11 +344,6 @@ static void *read_register(void *arg){
 			sprintf(reg_input,"reg[%d]=%d (0x%X)", i, tab_reg[i], tab_reg[i]);
 			printf("%s\n",reg_input);
 			add_to_list(&list_heads[i], tab_reg[i]);
-			data_ready = 1;
-			if(output[i] != list_heads[i]->number){
-				output[i] = list_heads[i]->number;
-			}
-			free(list_heads[i]);
 		}
 		usleep(100000);
 	}
