@@ -119,12 +119,11 @@ static int Update_Analog_Input_Read_Property(BACNET_READ_PROPERTY_DATA *rpdata){
 	if(list_heads[instance_no]){
 		current_object = list_get_first(&list_heads[instance_no]);
 	}
+	pthread_mutex_unlock(&list_lock);
 
 	bacnet_Analog_Input_Present_Value_Set(instance_no, current_object->number);
 	printf("Output %i is %i\n",instance_no,current_object->number);
 	free(current_object);
-
-	pthread_mutex_unlock(&list_lock);
 
 not_pv:
 	return bacnet_Analog_Input_Read_Property(rpdata);
