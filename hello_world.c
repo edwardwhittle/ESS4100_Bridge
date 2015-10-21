@@ -102,41 +102,7 @@ static number_object *list_get_first(number_object **list_heads){
 	*list_heads = (*list_heads)->next;
 	return first_object;
 }
-/*
-static bacnet_object_functions_t server_objects[] = {
-        {bacnet_OBJECT_DEVICE,
-	                NULL,
-			bacnet_Device_Count,		                
-			bacnet_Device_Index_To_Instance,
-			bacnet_Device_Valid_Object_Instance_Number,
-	                bacnet_Device_Object_Name,
-	                bacnet_Device_Read_Property_Local,
-	                bacnet_Device_Write_Property_Local,
-	                bacnet_Device_Property_Lists,
-			bacnet_DeviceGetRRInfo,																      NULL,*/ /* Iterator */
-			//NULL, /* Value_Lists */
-			//NULL, /* COV */	
-			//NULL, /* COV Clear */
-			//NULL /* Intrinsic Reporting */	
-	//},
-/*	{bacnet_OBJECT_ANALOG_INPUT,
-			bacnet_Analog_Input_Init,
-			bacnet_Analog_Input_Count,
-			bacnet_Analog_Input_Index_To_Instance,
-			bacnet_Analog_Input_Valid_Instance,
-			bacnet_Analog_Input_Object_Name,
-			Update_Analog_Input_Read_Property,
-			bacnet_Analog_Input_Write_Property,
-			bacnet_Analog_Input_Property_Lists,
-			NULL*/ /* ReadRangeInfo */// ,
-			//NULL /* Iterator */ ,
-/*			bacnet_Analog_Input_Encode_Value_List,
-			bacnet_Analog_Input_Change_Of_Value,
-			bacnet_Analog_Input_Change_Of_Value_Clear,
-			bacnet_Analog_Input_Intrinsic_Reporting},
-	{MAX_BACNET_OBJECT_TYPE}
-};
-*/
+
 /*Analog Output Function*/
 static int Update_Analog_Input_Read_Property(BACNET_READ_PROPERTY_DATA *rpdata){
 	

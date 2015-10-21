@@ -1,10 +1,25 @@
-README Document for the First Part of ESS4100 Project
+README Document for ESS4100 - Operating Systems and Network Programming Project
 
 By Edward Whittle - 4059767
 __________________________________________________________________
 
-This application uses libmodbus libraries to connect to a server on the Victoria University intranet. The server address is 140.159.153.159 with port number 502. 
-The application reads in the three random 32-bit numbers broadcasted by the server and prints them on the stdout. It will also print messages if the libmodbus context is succesfully created and if the connection is successful.
+*Introduction*
 
-If there are any problems with the creation of the libmodbus context, connection or reading of the registers the program will print out the error message on stderr output with the error message type attached. 
+This application acts as a BACnet to Modbus bridge where the application is a BACnet server and a Modbus client
+
+__________________________________________________________________
+
+*Modbus*
+
+This application uses libmodbus libraries to connect to a Modbus server on the Victoria University intranet. The server address is 140.159.153.159 on port 502. The initialisation function consists of error handling that will continue to try and re-establish the connection if it fails. 
+
+The reading of the registers from the Modbus server is implemented as a thread which runs every 100ms. The thread reads in the four 32-bit integers and stores them in a linked list array. It will display the string recieved from the Modbus server on the stdout interface whenever it is recieved. However only the 32-bit number will be stored in the linked list for transmission using BACnet.
+
+___________________________________________________________________
+
+*BACnet*
+
+The BACnet server is used to transmit the 32-bit integers from the Modbus server to a BACnet client with instance number 34 at address: 140.159.160.7 port: 0xBAC0. The BACnet server operations are conducted in the main function of the program with the configuration details defined at the top of the script. 
+
+The Update_Analog_Input_Read_Property variable is responsible for sending out the data from the linked lists to the Analog device. First it will check that there is data in the linked list using the instance number as the index and if so it will retrieve the first item on the linked list and store it into a "number_object" structure (contains the data and a pointer to address of the net data location)  called current_object. The 32-bit integer is extracted out of the data structure according to the instance number and is sent using the bacnet_Analog_Input_Present_Value_Set functon. For debugging purposes the value of the 32-bit integer and the instance number are printed on the stdout. The memory of the current_object is then freed. 
 
